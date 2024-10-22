@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 /// Entrypoint of the application.
@@ -74,7 +75,8 @@ class _DockState extends State<Dock> {
       height: 72,
       padding: const EdgeInsets.all(4),
       child: ReorderableListView(
-        scrollDirection: Axis.horizontal, // Drag horizontally like Dock
+        // Drag horizontally like Dock
+        scrollDirection: Axis.horizontal,
         buildDefaultDragHandles: false,
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
@@ -91,7 +93,7 @@ class _DockState extends State<Dock> {
         children: List.generate(
           _items.length,
           (index) {
-            return ReorderableDelayedDragStartListener(
+            return CustomReorderableDelayedDragStartListener(
               key: ValueKey(_items[index]), // Unique key to sort
               index: index,
               child: widget.builder.call(_items[index]),
@@ -99,6 +101,28 @@ class _DockState extends State<Dock> {
           },
         ),
       ),
+    );
+  }
+}
+
+class CustomReorderableDelayedDragStartListener extends ReorderableDragStartListener {
+  /// Creates a listener for an drag following a long press event over the
+  /// given child widget.
+  ///
+  /// This is most commonly used to wrap an entire list item in a reorderable
+  /// list.
+  const CustomReorderableDelayedDragStartListener({
+    super.key,
+    required super.child,
+    required super.index,
+    super.enabled,
+  });
+
+  @override
+  MultiDragGestureRecognizer createRecognizer() {
+    return DelayedMultiDragGestureRecognizer(
+      debugOwner: this,
+      delay: Duration.zero,
     );
   }
 }
